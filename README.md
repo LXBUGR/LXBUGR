@@ -11,3 +11,7 @@ AirportCarRental,LXBUGR
 # Leave a Message for My Profile!
 
 Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html).
+
+# Leave a Message for My Profile!
+
+Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html).
