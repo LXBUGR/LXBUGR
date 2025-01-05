@@ -1,23 +1,11 @@
-## Messages from Visitors
+# Hi, I'm YOUR_USERNAME! 👋
 
-- hallo
-## Hi there 👋
+Welcome to my GitHub profile! Here's an overview of my repositories:
 
-<!--
-**LXBUGR/LXBUGR** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## My Projects
 
-Here are some ideas to get you started:
+AirportCarRental,LXBUGR
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
 
-# Leave a Message for My Profile!
 
-Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html).
+*This overview is updated daily and whenever a new message is posted.*
