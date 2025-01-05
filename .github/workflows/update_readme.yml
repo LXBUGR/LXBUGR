@@ -1,8 +1,11 @@
-name: Update Profile Messages
+name: Update Profile README
 
 on:
   issues:
     types: [opened]
+  schedule:
+    - cron: "0 0 * * *" # Runs daily
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   update-readme:
@@ -11,18 +14,60 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Update README
-        run: |
-          echo "## Messages from Visitors" > temp.md
-          echo "" >> temp.md
-          echo "- ${{ github.event.issue.body }}" >> temp.md
-          cat README.md >> temp.md
-          mv temp.md README.md
+      - name: Fetch Repositories List
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const username = 'YOUR_USERNAME';
+            const repos = await github.repos.listForUser({
+              username,
+              sort: 'updated',
+              per_page: 100,
+            });
+
+            const repoList = repos.data.map(repo => 
+              `- [${repo.name}](${repo.html_url}): ${repo.description || 'No description provided.'}`
+            ).join('\n');
+
+            const { data: existingReadme } = await github.repos.getContent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'README.md',
+            });
+
+            const visitorMessages = `
+## Messages from Visitors
+
+${existingReadme.content ? Buffer.from(existingReadme.content, 'base64').toString().split('## Messages from Visitors')[1].trim() : ''}
+`;
+
+            const newReadmeContent = `
+# Hi, I'm ${username}! 👋
+
+Welcome to my GitHub profile! Here's an overview of my repositories:
+
+## My Projects
+
+${repoList}
+
+${visitorMessages}
+
+*This overview is updated daily and whenever a new message is posted.*
+`;
+
+            await github.repos.createOrUpdateFileContents({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'README.md',
+              message: 'Update README with repositories and messages',
+              content: Buffer.from(newReadmeContent).toString('base64'),
+              sha: existingReadme.sha,
+            });
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git add README.md
-          git commit -m "Add message from issue #${{ github.event.issue.number }}"
+          git commit -m "Update README with repositories and messages"
           git push
