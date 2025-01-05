@@ -1,8 +1,6 @@
 name: Update Profile README
 
 on:
-  issues:
-    types: [opened]
   schedule:
     - cron: "0 0 * * *" # Runs daily
   workflow_dispatch: # Allows manual trigger
@@ -11,61 +9,29 @@ jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Fetch Repositories and Update README
-        uses: actions/github-script@v6
+      # Use Repo-List-Generator to fetch repositories
+      - name: Get Repo List
+        id: repo
+        uses: yi-Xu-0100/repo-list-generator@v1.1.1
         with:
-          script: |
-            const username = 'YOUR_USERNAME';
-            const repos = await github.repos.listForUser({
-              username,
-              sort: 'updated',
-              per_page: 100,
-            });
+          my_token: ${{ secrets.REPO_TOKEN }} # Optional, only needed for private repos
 
-            // Create the repository list
-            const repoList = repos.data.map(repo => 
-              `- [${repo.name}](${repo.html_url}): ${repo.description || 'No description provided.'}`
-            ).join('\n');
+      # Update README with the repository list
+      - name: Update README
+        run: |
+          echo "# Hi, I'm Alex! 👋" > README.md
+          echo "" >> README.md
+          echo "## My Projects" >> README.md
+          echo "" >> README.md
+          echo "${{ steps.repo.outputs.repoList }}" >> README.md
+          echo "" >> README.md
+          echo "*This overview is updated daily.*" >> README.md
 
-            // Fetch existing README content
-            const { data: existingReadme } = await github.repos.getContent({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              path: 'README.md',
-            });
-
-            const existingContent = Buffer.from(existingReadme.content, 'base64').toString();
-
-            // Extract existing visitor messages
-            const messagesStartIndex = existingContent.indexOf('## Messages from Visitors');
-            const visitorMessages = messagesStartIndex !== -1 
-              ? existingContent.slice(messagesStartIndex).trim()
-              : '## Messages from Visitors\n\nNo messages yet!';
-
-            // Construct the new README content
-            const newReadmeContent = [
-              `# Hi, I'm ${username}! 👋`,
-              ``,
-              `Welcome to my GitHub profile! Here's an overview of my repositories:`,
-              ``,
-              `## My Projects`,
-              ``,
-              repoList,
-              ``,
-              visitorMessages,
-              ``,
-              `*This overview is updated daily and whenever a new message is posted.*`,
-            ].join('\n');
-
-            // Update the README file
-            await github.repos.createOrUpdateFileContents({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              path: 'README.md',
-              message: 'Update README with repositories and messages',
-              content: Buffer.from(newReadmeContent, 'utf-8').toString('base64'),
-              sha: existingReadme.sha,
-            });
+      # Commit and push the changes
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update README with repository list"
+          git push
