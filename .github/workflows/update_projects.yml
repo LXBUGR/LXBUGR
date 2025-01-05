@@ -1,43 +1,52 @@
-name: Update Projects Overview
+name: Update Profile README
 
 on:
   schedule:
     - cron: "0 0 * * *" # Runs daily
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Repositories
+      - name: Fetch Repositories List
         uses: actions/github-script@v6
         with:
           script: |
+            const username = 'YOUR_USERNAME';
             const repos = await github.repos.listForUser({
-              username: 'YOUR_USERNAME',
+              username,
               sort: 'updated',
               per_page: 100,
             });
-            const projects = repos.data.map(repo => `- [${repo.name}](${repo.html_url}): ${repo.description || 'No description provided.'}`).join('\n');
+
+            const repoList = repos.data.map(repo => 
+              `- [${repo.name}](${repo.html_url}): ${repo.description || 'No description provided.'}`
+            ).join('\n');
+
             const readmeContent = `
-              # My Projects
+# Hi, I'm ${username}! 👋
 
-              Here are my latest public repositories:
+Welcome to my GitHub profile! Here's an overview of my repositories:
 
-              ${projects}
+## My Projects
 
-              *This overview is updated daily.*
-            `;
-            const {data: existing} = await github.repos.getContent({
+${repoList}
+
+*This overview is updated daily by a GitHub Actions workflow.*
+`;
+
+            const { data: existingReadme } = await github.repos.getContent({
               owner: context.repo.owner,
               repo: context.repo.repo,
               path: 'README.md',
             });
+
             await github.repos.createOrUpdateFileContents({
               owner: context.repo.owner,
               repo: context.repo.repo,
               path: 'README.md',
-              message: 'Update project overview',
+              message: 'Update README with latest repositories',
               content: Buffer.from(readmeContent).toString('base64'),
-              sha: existing.sha,
+              sha: existingReadme.sha,
             });
