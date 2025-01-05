@@ -44,7 +44,7 @@ jobs:
       # Update README
       - name: Update README
         run: |
-          echo "# Hi, I'm YOUR_USERNAME! 👋" > README.md
+          echo "# Hi, I'm Alex! 👋" > README.md
           echo "" >> README.md
           echo "Welcome to my GitHub profile! Here's an overview of my repositories:" >> README.md
           echo "" >> README.md
