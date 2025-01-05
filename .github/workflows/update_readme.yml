@@ -22,27 +22,26 @@ jobs:
         with:
           my_token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Read existing README content
-      - name: Read Existing README
-        id: read-readme
-        run: |
-          if [ -f README.md ]; then
-            cat README.md > existing_readme.md
-          else
-            echo "## Messages from Visitors\n\nNo messages yet!" > existing_readme.md
-          fi
+      # Fetch visitor messages from issues
+      - name: Get Visitor Messages
+        id: messages
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open", // Only fetch open issues
+            });
 
-      # Extract Visitor Messages
-      - name: Extract Visitor Messages
-        id: extract-messages
-        run: |
-          if grep -q "## Messages from Visitors" existing_readme.md; then
-            sed -n '/## Messages from Visitors/,$p' existing_readme.md > visitor_messages.md
-          else
-            echo "## Messages from Visitors\n\nNo messages yet!" > visitor_messages.md
-          fi
+            const messages = issues.data
+              .map(issue => `- **${issue.user.login}**: ${issue.body}`)
+              .join('\n');
 
-      # Construct New README
+            return messages || "No messages yet!";
+          result-encoding: string
+
+      # Update README
       - name: Update README
         run: |
           echo "# Hi, I'm YOUR_USERNAME! 👋" > README.md
@@ -53,7 +52,9 @@ jobs:
           echo "" >> README.md
           echo "${{ steps.repo.outputs.repoList }}" >> README.md
           echo "" >> README.md
-          cat visitor_messages.md >> README.md
+          echo "## Messages from Visitors" >> README.md
+          echo "" >> README.md
+          echo "${{ steps.messages.outputs.result }}" >> README.md
           echo "" >> README.md
           echo "# Leave a Message for My Profile!" >> README.md
           echo "" >> README.md
