@@ -6,13 +6,12 @@
     <title>Write a Message</title>
 </head>
 <body>
-    <h1>Write a Message to My GitHub Profile</h1>
-    <form action="https://api.github.com/repos/LXBUGR/LXBUGR/issues" method="POST">
+    <h1>Leave a Message for My GitHub Profile</h1>
+    <form action="https://github.com/LXBUGR/LXBUGR/issues/new" method="get">
         <label for="message">Your Message:</label><br>
         <textarea id="message" name="body" rows="4" cols="50" required></textarea><br><br>
         <input type="hidden" name="title" value="New Message">
-        <input type="submit" value="Submit">
+        <button type="submit">Submit</button>
     </form>
-    <p>Note: Messages will be moderated before appearing on the profile.</p>
 </body>
 </html>
