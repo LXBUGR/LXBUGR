@@ -6,6 +6,8 @@ Welcome to my GitHub profile! Here's an overview of my repositories:
 
 AirportCarRental,LXBUGR
 
+## Messages from Visitors\n\nNo messages yet!
 
+# Leave a Message for My Profile!
 
-*This overview is updated daily and whenever a new message is posted.*
+Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html).
