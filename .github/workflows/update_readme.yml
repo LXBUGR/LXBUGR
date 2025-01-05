@@ -11,28 +11,38 @@ jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      # Use Repo-List-Generator to fetch repositories
-      - name: Get Repo List
-        id: repo
-        uses: yi-Xu-0100/repo-list-generator@v1.1.1
-        with:
-          my_token: ${{ secrets.GITHUB_TOKEN }} # Optional, for private repos
-
       # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Read existing README for visitor messages
+      # Fetch repository list
+      - name: Get Repo List
+        id: repo
+        uses: yi-Xu-0100/repo-list-generator@v1.1.1
+        with:
+          my_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Read existing README content
       - name: Read Existing README
         id: read-readme
         run: |
           if [ -f README.md ]; then
-            grep -A 100 "## Messages from Visitors" README.md || echo "## Messages from Visitors\n\nNo messages yet!" > visitor_messages.md
+            cat README.md > existing_readme.md
+          else
+            echo "## Messages from Visitors\n\nNo messages yet!" > existing_readme.md
+          fi
+
+      # Extract Visitor Messages
+      - name: Extract Visitor Messages
+        id: extract-messages
+        run: |
+          if grep -q "## Messages from Visitors" existing_readme.md; then
+            sed -n '/## Messages from Visitors/,$p' existing_readme.md > visitor_messages.md
           else
             echo "## Messages from Visitors\n\nNo messages yet!" > visitor_messages.md
           fi
 
-      # Update README with repository list and visitor messages
+      # Construct New README
       - name: Update README
         run: |
           echo "# Hi, I'm YOUR_USERNAME! 👋" > README.md
@@ -43,15 +53,17 @@ jobs:
           echo "" >> README.md
           echo "${{ steps.repo.outputs.repoList }}" >> README.md
           echo "" >> README.md
-          echo "$(cat visitor_messages.md)" >> README.md
+          cat visitor_messages.md >> README.md
           echo "" >> README.md
-          echo "*This overview is updated daily and whenever a new message is posted.*" >> README.md
+          echo "# Leave a Message for My Profile!" >> README.md
+          echo "" >> README.md
+          echo "Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html)." >> README.md
 
-      # Commit and push the changes
+      # Commit and Push Changes
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update README with repositories and messages"
+          git commit -m "Update README with repositories and visitor messages"
           git push
