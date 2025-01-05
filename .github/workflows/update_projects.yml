@@ -1,0 +1,43 @@
+name: Update Projects Overview
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs daily
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repositories
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const repos = await github.repos.listForUser({
+              username: 'YOUR_USERNAME',
+              sort: 'updated',
+              per_page: 100,
+            });
+            const projects = repos.data.map(repo => `- [${repo.name}](${repo.html_url}): ${repo.description || 'No description provided.'}`).join('\n');
+            const readmeContent = `
+              # My Projects
+
+              Here are my latest public repositories:
+
+              ${projects}
+
+              *This overview is updated daily.*
+            `;
+            const {data: existing} = await github.repos.getContent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'README.md',
+            });
+            await github.repos.createOrUpdateFileContents({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'README.md',
+              message: 'Update project overview',
+              content: Buffer.from(readmeContent).toString('base64'),
+              sha: existing.sha,
+            });
