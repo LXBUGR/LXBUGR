@@ -16,7 +16,7 @@ jobs:
         id: repo
         uses: yi-Xu-0100/repo-list-generator@v1.1.1
         with:
-          my_token: ${{ secrets.REPO_TOKEN }} # Optional, for private repos
+          my_token: ${{ secrets.GITHUB_TOKEN }} # Optional, for private repos
 
       # Checkout the repository
       - name: Checkout Repository
