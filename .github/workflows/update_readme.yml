@@ -46,19 +46,19 @@ jobs:
               : '## Messages from Visitors\n\nNo messages yet!';
 
             // Construct the new README content
-            const newReadmeContent = `
-# Hi, I'm ${username}! 👋
-
-Welcome to my GitHub profile! Here's an overview of my repositories:
-
-## My Projects
-
-${repoList}
-
-${visitorMessages}
-
-*This overview is updated daily and whenever a new message is posted.*
-`;
+            const newReadmeContent = [
+              `# Hi, I'm ${username}! 👋`,
+              ``,
+              `Welcome to my GitHub profile! Here's an overview of my repositories:`,
+              ``,
+              `## My Projects`,
+              ``,
+              repoList,
+              ``,
+              visitorMessages,
+              ``,
+              `*This overview is updated daily and whenever a new message is posted.*`,
+            ].join('\n');
 
             // Update the README file
             await github.repos.createOrUpdateFileContents({
@@ -66,14 +66,6 @@ ${visitorMessages}
               repo: context.repo.repo,
               path: 'README.md',
               message: 'Update README with repositories and messages',
-              content: Buffer.from(newReadmeContent).toString('base64'),
+              content: Buffer.from(newReadmeContent, 'utf-8').toString('base64'),
               sha: existingReadme.sha,
             });
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update README with repositories and messages"
-          git push
