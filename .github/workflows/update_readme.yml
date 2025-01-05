@@ -1,6 +1,8 @@
 name: Update Profile README
 
 on:
+  issues:
+    types: [opened] # Trigger on new issues
   schedule:
     - cron: "0 0 * * *" # Runs daily
   workflow_dispatch: # Allows manual trigger
@@ -14,18 +16,36 @@ jobs:
         id: repo
         uses: yi-Xu-0100/repo-list-generator@v1.1.1
         with:
-          my_token: ${{ secrets.REPO_TOKEN }} # Optional, only needed for private repos
+          my_token: ${{ secrets.REPO_TOKEN }} # Optional, for private repos
 
-      # Update README with the repository list
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Read existing README for visitor messages
+      - name: Read Existing README
+        id: read-readme
+        run: |
+          if [ -f README.md ]; then
+            grep -A 100 "## Messages from Visitors" README.md || echo "## Messages from Visitors\n\nNo messages yet!" > visitor_messages.md
+          else
+            echo "## Messages from Visitors\n\nNo messages yet!" > visitor_messages.md
+          fi
+
+      # Update README with repository list and visitor messages
       - name: Update README
         run: |
-          echo "# Hi, I'm Alex! 👋" > README.md
+          echo "# Hi, I'm YOUR_USERNAME! 👋" > README.md
+          echo "" >> README.md
+          echo "Welcome to my GitHub profile! Here's an overview of my repositories:" >> README.md
           echo "" >> README.md
           echo "## My Projects" >> README.md
           echo "" >> README.md
           echo "${{ steps.repo.outputs.repoList }}" >> README.md
           echo "" >> README.md
-          echo "*This overview is updated daily.*" >> README.md
+          echo "$(cat visitor_messages.md)" >> README.md
+          echo "" >> README.md
+          echo "*This overview is updated daily and whenever a new message is posted.*" >> README.md
 
       # Commit and push the changes
       - name: Commit and Push Changes
@@ -33,5 +53,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update README with repository list"
+          git commit -m "Update README with repositories and messages"
           git push
