@@ -1,4 +1,4 @@
-# Hi, I'm YOUR_USERNAME! 👋
+# Hi, I'm Alex! 👋
 
 Welcome to my GitHub profile! Here's an overview of my repositories:
 
