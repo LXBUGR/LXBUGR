@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Fetch Repositories List
+      - name: Fetch Repositories and Update README
         uses: actions/github-script@v6
         with:
           script: |
@@ -25,22 +25,27 @@ jobs:
               per_page: 100,
             });
 
+            // Create the repository list
             const repoList = repos.data.map(repo => 
               `- [${repo.name}](${repo.html_url}): ${repo.description || 'No description provided.'}`
             ).join('\n');
 
+            // Fetch existing README content
             const { data: existingReadme } = await github.repos.getContent({
               owner: context.repo.owner,
               repo: context.repo.repo,
               path: 'README.md',
             });
 
-            const visitorMessages = `
-## Messages from Visitors
+            const existingContent = Buffer.from(existingReadme.content, 'base64').toString();
 
-${existingReadme.content ? Buffer.from(existingReadme.content, 'base64').toString().split('## Messages from Visitors')[1].trim() : ''}
-`;
+            // Extract existing visitor messages
+            const messagesStartIndex = existingContent.indexOf('## Messages from Visitors');
+            const visitorMessages = messagesStartIndex !== -1 
+              ? existingContent.slice(messagesStartIndex).trim()
+              : '## Messages from Visitors\n\nNo messages yet!';
 
+            // Construct the new README content
             const newReadmeContent = `
 # Hi, I'm ${username}! 👋
 
@@ -55,6 +60,7 @@ ${visitorMessages}
 *This overview is updated daily and whenever a new message is posted.*
 `;
 
+            // Update the README file
             await github.repos.createOrUpdateFileContents({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -63,11 +69,3 @@ ${visitorMessages}
               content: Buffer.from(newReadmeContent).toString('base64'),
               sha: existingReadme.sha,
             });
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update README with repositories and messages"
-          git push
