@@ -17,4 +17,4 @@ Here are some ideas to get you started:
 
 # Leave a Message for My Profile!
 
-Want your message featured on this page? [Submit your message here](https://YOUR_USERNAME.github.io/YOUR_USERNAME/write_message.html).
+Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html).
