@@ -8,8 +8,7 @@ AirportCarRental,burgeralexander,myselfie
 
 ## Messages from Visitors
 
-- **burgeralexander**: Ok, nice
-- **burgeralexander**: Hallo, test!!!
+No messages yet!
 
 # Leave a Message for My Profile!
 
