@@ -8,8 +8,10 @@ AirportCarRental,burgeralexander,myselfie
 
 ## Messages from Visitors
 
-No messages yet!
+- **burgeralexander**: Ok
+- **burgeralexander**: Hallo
+- **burgeralexander**: Ok
 
 # Leave a Message for My Profile!
 
-Want your message featured on this page? [Submit your message here](https://burgeralexander.github.io/burgeralexander/write_message.html).
+Want your message featured on this page? [Submit your message here](https://LXBUGR.github.io/LXBUGR/write_message.html).
