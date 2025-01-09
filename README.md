@@ -10,7 +10,6 @@ AirportCarRental,burgeralexander,myselfie
 
 - **burgeralexander**: Ok
 - **burgeralexander**: Hallo
-- **burgeralexander**: Ok
 
 # Leave a Message for My Profile!
 
